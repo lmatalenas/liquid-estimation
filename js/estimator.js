@@ -1,5 +1,5 @@
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(30, 1500 / 800, 0.1, 5000);
+var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 5000);
 var currentGlass = 0;
 var currentTrial = 0;
 var lastGlass = 0;
@@ -14,7 +14,7 @@ var startTime = 0;
 var lastAmt;
 
 var renderer = new THREE.WebGLRenderer({antialias: true, physicallyCorrectLights: true});
-renderer.setSize(1500, 800);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
 document.body.appendChild(renderer.domElement);
@@ -116,7 +116,7 @@ for (i = 0; i < glassesFile.length; i++) {
 	userFillMeshes.push(new THREE.Mesh(userFills[i], fillMat));
 	userGlassMeshes.push(new THREE.Mesh(userGlasses[i], glassMat));
 	
-	fillMeshes[i].position.add(new THREE.Vector3(-(400+userGlassTopRad)*0.65, fillLevel/2+10, 0));
+	fillMeshes[i].position.add(new THREE.Vector3(-(400+userGlassTopRad)*0.65, fillLevel/2, 0));
 	fillMeshes[i].castShadow = true;
 	
 	glassMeshes[i].position.add(new THREE.Vector3(-(400+userGlassTopRad)*0.65, glassHeight/2, 0));
@@ -153,8 +153,8 @@ function onDocumentMouseMove(event) {
 	
 	raycaster.setFromCamera(mouse, camera);
 	event.preventDefault();
-	mouse.x = (event.clientX / 1500) * 2 - 1;
-	mouse.y = -(event.clientY / 800) * 2 + 1;
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 	
 	var intersects = raycaster.intersectObject(userGlassMeshes[currentGlass]);
 	intersection = ( intersects.length ) > 0 ? intersects[ 0 ] : null;
@@ -171,7 +171,7 @@ function onDocumentMouseMove(event) {
 		
 		userFills[currentGlass] = new THREE.CylinderBufferGeometry(glassesFile[currentGlass][3]+(glassesFile[currentGlass][2]-glassesFile[currentGlass][3])*amt/500, glassesFile[currentGlass][3], amt, 48);
 		userFillMeshes[currentGlass] = new THREE.Mesh(userFills[currentGlass], fillMat);
-		userFillMeshes[currentGlass].position.add(new THREE.Vector3((410+glassesFile[currentGlass][2])*0.65, amt/2+10, 0));
+		userFillMeshes[currentGlass].position.add(new THREE.Vector3((400+glassesFile[currentGlass][2])*0.65, amt/2, 0));
 		userFillMeshes[currentGlass].renderOrder = -3;
 		userFillMeshes[currentGlass].castShadow = true;
 		
@@ -193,11 +193,11 @@ function onSubmit(event) {
 	var fillBotRad = userFills[currentGlass].parameters.radiusBottom;
 	var endTime = Date.now();
 	var timeTaken = endTime - startTime;
-
+	startTime = endTime;
 	
 	var userVol = fillHeight*Math.PI*(Math.pow(fillTopRad,2)+fillTopRad*fillBotRad+Math.pow(fillBotRad,2))/3;
-	results[currentTrial] = [currentGlass+1, glassesFile[currentGlass][1], glassesFile[currentGlass][2], glassesFile[currentGlass][3], vol[currentGlass], userVol, userVol/vol[currentGlass]-1, timeTaken, startTime, endTime];
-	startTime = endTime;	
+	results[currentTrial] = [currentGlass+1, vol[currentGlass], userVol, userVol/vol[currentGlass]-1, timeTaken/1000];
+	
 	currentTrial++;
 	currentGlass = trialOrder[currentTrial];
 }
