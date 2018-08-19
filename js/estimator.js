@@ -241,6 +241,10 @@ function onSubmit(event) {
 	startTime = endTime;	
 	currentTrial++;
 	currentGlass = trialOrder[currentTrial];
+	if (currentTrial >= 63) {
+		alert("You will now be redirected to the end survey.");
+		window.location.replace("https://ncsu.qualtrics.com/jfe/form/SV_abq4JnHNBsXqVQ9?userID=" + userID);
+	}
 }
 
 document.addEventListener('mousemove', onDocumentMouseMove, false);
