@@ -1,5 +1,5 @@
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(30, 1500 / 800, 0.1, 5000);
+var camera = new THREE.PerspectiveCamera(40, 1500 / 800, 0.1, 5000);
 var currentGlass = 0;
 var currentTrial = 0;
 var lastGlass = 0;
@@ -10,6 +10,29 @@ var intersection = null;
 var notInitialized = true;
 var amtLocked = false;
 var startTime = 0;
+var db = firebase.firestore();
+
+var userID = 0;
+function parseURLParams(url) {
+	var queryStart = url.indexOf("?") + 1,
+		queryEnd   = url.indexOf("#") + 1 || url.length + 1,
+		query = url.slice(queryStart, queryEnd - 1),
+		pairs = query.replace(/\+/g, " ").split("&"),
+		parms = {}, i, n, v, nv;
+
+	if (query === url || query === "") return;
+
+	for (i = 0; i < pairs.length; i++) {
+		nv = pairs[i].split("=", 2);
+		n = decodeURIComponent(nv[0]);
+		v = decodeURIComponent(nv[1]);
+
+		if (!parms.hasOwnProperty(n)) parms[n] = [];
+		parms[n].push(nv.length === 2 ? v : null);
+	}
+	return parms;
+}
+var userID = parseURLParams(window.location.href)["userID"][0];
 
 var lastAmt;
 
@@ -23,7 +46,7 @@ var roomMat = new THREE.MeshStandardMaterial({color: 0x888570, side: THREE.BackS
 var groundMat = new THREE.MeshStandardMaterial({color: 0x696969, roughness: 1});
 var fillMat = new THREE.MeshStandardMaterial({color: 0xaaffff, transparent: true, opacity: 0.7, roughness: 0, metalness: 0.5});
 var glassMat = new THREE.MeshStandardMaterial({color: 0xffffff, transparent: true, opacity: 0.2, roughness: 0, metalness: 0.5});
-var ground = new THREE.Mesh(new THREE.BoxGeometry(2500, 400, 2500, 100), groundMat);
+var ground = new THREE.Mesh(new THREE.BoxGeometry(4000, 400, 2500), groundMat);
 ground.position.y = -210;
 ground.receiveShadow = true;
 var room = new THREE.Mesh(new THREE.BoxGeometry(3000, 3000, 3000), roomMat);
@@ -134,8 +157,8 @@ for (i = 0; i < glassesFile.length; i++) {
 
 function animate() {
 	setTimeout( function() {
-        requestAnimationFrame( animate );
-    }, 1000 / 5 );
+		requestAnimationFrame( animate );
+	}, 1000 / 5 );
 	
 	if (lastGlass !== currentGlass || notInitialized) {
 		scene.remove(glassMeshes[lastGlass], fillMeshes[lastGlass], userGlassMeshes[lastGlass], userFillMeshes[lastGlass]);	
@@ -196,7 +219,25 @@ function onSubmit(event) {
 
 	
 	var userVol = fillHeight*Math.PI*(Math.pow(fillTopRad,2)+fillTopRad*fillBotRad+Math.pow(fillBotRad,2))/3;
-	results[currentTrial] = [currentGlass+1, glassesFile[currentGlass][1], glassesFile[currentGlass][2], glassesFile[currentGlass][3], vol[currentGlass], userVol, userVol/vol[currentGlass]-1, timeTaken, startTime, endTime];
+	db.collection(userID).add({
+		glass: currentGlass+1,
+		exampleFill: glassesFile[currentGlass][1],
+		userTopRad: glassesFile[currentGlass][2],
+		userBotRad: glassesFile[currentGlass][3],
+		exampleVol: vol[currentGlass],
+		userVol: userVol,
+		percentError: userVol/vol[currentGlass]-1,
+		timeTaken: timeTaken,
+		startTime: startTime,
+		endTime: endTime
+	})
+	.then(function(docRef) {
+		console.log("Document written with ID: ", docRef.id);
+	})
+	.catch(function(error) {
+		console.error("Error adding document: ", error);
+	});
+
 	startTime = endTime;	
 	currentTrial++;
 	currentGlass = trialOrder[currentTrial];

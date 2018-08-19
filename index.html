@@ -42,6 +42,19 @@
 				border-width:3px;
 			}
 		</style>
+		<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
+		<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyBGa881ApvrCzLqEULxYElsdq_x1cDiMDg",
+			authDomain: "liquid-estimation.firebaseapp.com",
+			databaseURL: "https://liquid-estimation.firebaseio.com",
+			projectId: "liquid-estimation",
+			storageBucket: "liquid-estimation.appspot.com",
+			messagingSenderId: "416375362248"
+		};
+		firebase.initializeApp(config);
+		</script>
 		<script src="js/three.js"></script>
 		<script src="js/jquery-3.3.1.js"></script>
 		<script src="js/jquery.csv.min.js"></script>
