@@ -242,8 +242,7 @@ function onSubmit(event) {
         percentError: userVol/vol[currentGlass]-1,
         timeTaken: timeTaken,
         startTime: startTime,
-        endTime: endTime,
-        dissertation: 1
+        endTime: endTime
     })
         .then(function(docRef) {
             console.log("Document written with ID: ", docRef.id);
@@ -257,7 +256,7 @@ function onSubmit(event) {
     currentGlass = trialOrder[currentTrial];
     if (currentTrial >= 63) {
         alert("You will now be redirected to the end survey.");
-        window.location.replace("https://ncsu.qualtrics.com/jfe/form/SV_803MDy8ppLZdFfD?userID=" + userID);
+        window.location.replace("https://ncsu.qualtrics.com/jfe/form/SV_abq4JnHNBsXqVQ9?userID=" + userID);
     }
 }
 
