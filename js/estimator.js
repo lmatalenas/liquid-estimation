@@ -1,3 +1,5 @@
+// Non-dissertation version
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(40, 1500 / 800, 0.1, 5000);
 var currentGlass = 0;
@@ -222,16 +224,16 @@ function onDocumentMouseDown(event) {
 }
 
 function onSubmit(event) {
-    updateGlassFill(0);
-
     var fillHeight = userFills[currentGlass].parameters.height;
     var fillTopRad = userFills[currentGlass].parameters.radiusTop;
     var fillBotRad = userFills[currentGlass].parameters.radiusBottom;
     var endTime = Date.now();
     var timeTaken = endTime - startTime;
 
+    updateGlassFill(0);
 
     var userVol = fillHeight*Math.PI*(Math.pow(fillTopRad,2)+fillTopRad*fillBotRad+Math.pow(fillBotRad,2))/3;
+
     db.collection(userID).add({
         glass: currentGlass+1,
         exampleFill: glassesFile[currentGlass][1],
